@@ -298,6 +298,8 @@
         // API 配置
         const API_BASE = 'https://api.wendu.cn/mobile/index.php?app=mobile&controller=article&action=index';
         const ARTICLE_URL = 'https://wap.wendu.cn/article/id/';
+        // 代理 API（解决跨域问题）
+        const PROXY_BASE = 'https://api.allorigins.win/raw?url=';
         
         // 状态
         let page = 0;
@@ -326,13 +328,11 @@
             }
             
             try {
-                const resp = await fetch(API_BASE + '&page=' + page, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)',
-                        'Referer': 'https://wap.wendu.cn/'
-                    }
-                });
-                const data = await resp.json();
+                // 使用代理解决跨域
+                const apiUrl = encodeURIComponent(API_BASE + '&page=' + page);
+                const resp = await fetch(PROXY_BASE + apiUrl);
+                const text = await resp.text();
+                const data = JSON.parse(text);
                 
                 if (data.state && data.data && data.data.length > 0) {
                     newsData = newsData.concat(data.data);
